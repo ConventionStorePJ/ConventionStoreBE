@@ -1,0 +1,52 @@
+name: CI/CD Deploy to EC2
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    name: Build & Push Docker Image, then Deploy to EC2
+    runs-on: ubuntu-latest  # GitHub Actions에서 제공하는 가상환경
+
+    steps:
+      # 1. GitHub 코드 가져오기
+      - name: Checkout Source Code
+        uses: actions/checkout@v3
+
+      # 2. AWS 인증 설정 (IAM 사용자 정보 필요)
+      - name: Configure AWS Credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ${{ secrets.AWS_REGION }}
+
+      # 3. ECR 로그인
+      - name: Login to Amazon ECR
+        run: |
+          aws ecr get-login-password | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
+
+      # 4. Docker 이미지 빌드 및 ECR에 push
+      - name: Build and Push Docker Image to ECR
+        run: |
+          docker build -t ${{ secrets.ECR_REPOSITORY }} .
+          docker tag ${{ secrets.ECR_REPOSITORY }}:latest ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+          docker push ${{ secrets.ECR_REGISTRY }}/${{ secrets.ECR_REPOSITORY }}:latest
+
+      # 5. EC2에 SSH로 접속해서 docker compose pull & up
+      - name: Deploy to EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.EC2_HOST }}          # EC2 퍼블릭 DNS 또는 IP
+          username: ${{ secrets.EC2_USER }}      # ex: ec2-user (Amazon Linux), ubuntu (Ubuntu)
+          key: ${{ secrets.EC2_KEY }}            # SSH 개인키 (PEM 파일 내용 전체 복사)
+          script: |
+            # EC2 내부에서 compose 파일 있는 폴더로 이동
+            cd convention_store_server
+            
+            # 최신 이미지 가져오기
+            docker compose pull
+            
+            # 컨테이너 재시작 (백그라운드 모드)
+            docker compose up -d
