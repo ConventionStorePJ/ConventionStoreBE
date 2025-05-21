@@ -42,8 +42,9 @@ jobs:
           username: ${{ secrets.EC2_USER }}      # ex: ec2-user (Amazon Linux), ubuntu (Ubuntu)
           key: ${{ secrets.EC2_KEY }}            # SSH 개인키 (PEM 파일 내용 전체 복사)
           script: |
+            set -e
             # EC2 내부에서 compose 파일 있는 폴더로 이동
-            cd convention_store_server
+            cd ~/convention_store_server
             
             # 최신 이미지 가져오기
             docker compose pull
