@@ -46,10 +46,13 @@ jobs:
             # EC2 내부에서 compose 파일 있는 폴더로 이동
             cd ~/convention_store_server
             
-            # 🔐 EC2 내부에서 ECR 로그인 먼저
+            # EC2 내부에서 ECR 로그인 먼저
             aws ecr get-login-password --region ${{ secrets.AWS_REGION }} \
             | docker login --username AWS --password-stdin ${{ secrets.ECR_REGISTRY }}
             
+            echo "[2] 이전 컨테이너 종료"
+            docker compose down || true  
+      
             # 최신 이미지 가져오기
             docker compose pull
             
