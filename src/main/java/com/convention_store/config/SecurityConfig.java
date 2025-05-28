@@ -10,7 +10,7 @@ import org.springframework.security.config.annotation.web.configurers.AbstractHt
 import org.springframework.security.config.annotation.web.configurers.HeadersConfigurer.FrameOptionsConfig;
 import org.springframework.security.web.SecurityFilterChain;
 
-// @Configuration
+@Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
     
@@ -32,7 +32,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
-                                "/swagger-ui.html"
+                                "/swagger-ui.html",
+                                "/api/**"
                         ).permitAll() // 🔓 Swagger 허용
                         .anyRequest().permitAll() // 🔓 나머지도 지금은 전체 허용
                 )

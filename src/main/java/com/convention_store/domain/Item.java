@@ -24,13 +24,17 @@ public class Item extends BaseTimeEntity {
     
     @Column(name = "item_name", length = 100, nullable = false)
     private String itemName;
+
+    @Column(name = "price", length = 100, nullable = false)
+    private Long price;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "franchise_id", nullable = false)
     private Franchise franchise;
-    
-    @OneToMany(mappedBy = "item", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Discount> discounts = new ArrayList<>();
+
+    // 복수할인이 들어가는 경우는 거의 없으므로 onetoone으로 변경
+    @OneToOne(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
+    private Discount discount;
     
     @OneToMany(mappedBy = "item", fetch = FetchType.LAZY)
     private List<CombinationItem> combinationItems = new ArrayList<>();
@@ -70,17 +74,21 @@ public class Item extends BaseTimeEntity {
             this.franchise = null; // 실제 DB에서는 NOT NULL 제약조건 위반
         }
     }
-    
-    public void addDiscount(Discount discount) {
-        if (discount == null) {
-            throw new IllegalArgumentException("Discount cannot be null.");
+
+    public void setDiscount(Discount discount) {
+        if (discount == null) throw new IllegalArgumentException("Discount cannot be null.");
+
+        // 기존 할인 제거 (있다면)
+        if (this.discount != null) {
+            this.discount.disassociateItem(); // Discount에 이 메서드 있어야 함
         }
-        if (!this.discounts.contains(discount)) {
-            this.discounts.add(discount);
-            discount.associateWithItem(this);
-        }
+
+        this.discount = discount;
+        discount.associateWithItem(this); // 양방향 관계 설정
     }
-    
+
+
+
     public void addCombinationItem(CombinationItem combinationItem) {
         if (combinationItem == null) {
             throw new IllegalArgumentException("CombinationItem cannot be null.");
@@ -92,13 +100,14 @@ public class Item extends BaseTimeEntity {
     }
     
     // --- 비즈니스 로직 (관계 제거) ---
-    public void removeDiscount(Discount discount) {
-        if (this.discounts.remove(discount)) {
-            // orphanRemoval = true 이므로 명시적으로 discount.setItem(null) 할 필요 없음
-            // (JPA가 관계 끊어짐 감지 시 자동 삭제)
+    public void removeDiscount() {
+        if (this.discount != null) {
+            this.discount.disassociateItem();
+            this.discount = null;
         }
     }
-    
+
+
     public void removeCombinationItem(CombinationItem combinationItem) {
         if (this.combinationItems.remove(combinationItem)) {
             combinationItem.disassociateItem();

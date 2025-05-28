@@ -38,6 +38,9 @@ public class Post extends BaseTimeEntity {
     
     @Column(name = "password_hash", length = 260)
     private String passwordHash;
+
+    @Column(name = "like_count")
+    private Long likeCount;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "combination_id", nullable = true)
