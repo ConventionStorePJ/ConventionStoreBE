@@ -1,5 +1,6 @@
 package com.convention_store.controller;
 
+import com.convention_store.dto.PostDetailDto;
 import com.convention_store.dto.PostDto;
 import com.convention_store.service.CommunityService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -9,6 +10,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -34,5 +36,19 @@ public class CommunityController {
     public ResponseEntity<List<PostDto>> getAllPosts() {
         List<PostDto> posts = communityService.getAllPosts();
         return ResponseEntity.ok(posts);
+    }
+
+    @Operation(
+            summary = "특정 게시글 조회",
+            description = "클릭한 게시글 정보를 (댓글포함) 반환합니다."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정상적으로 게시글 정보 반환"),
+            @ApiResponse(responseCode = "500", description = "서버 오류")
+    })
+    @GetMapping("/posts/{postId}")
+    public ResponseEntity<PostDetailDto> getPost(@PathVariable Long postId){
+        PostDetailDto post = communityService.getPost(postId);
+        return ResponseEntity.ok(post);
     }
 }

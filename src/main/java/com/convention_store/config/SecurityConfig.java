@@ -13,31 +13,35 @@ import org.springframework.security.web.SecurityFilterChain;
 @Configuration
 @RequiredArgsConstructor
 public class SecurityConfig {
-    
+
     private final Environment env;
-    
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        boolean isDevProfileActive = env.acceptsProfiles(Profiles.of("dev"));
-        if (isDevProfileActive) {
-            // 개발 환경에서는 X-Frame-Options 비활성화
-            http.headers(headers ->
-                headers.frameOptions(FrameOptionsConfig::disable)
-            );
+        boolean isDev = env.acceptsProfiles(Profiles.of("dev"));
+
+        if (isDev) {
+            // 개발 환경에서는 H2 콘솔과 iframe 허용
+            http
+                    .headers(headers -> headers.frameOptions(FrameOptionsConfig::disable))
+                    .csrf(csrf -> csrf.ignoringRequestMatchers("/h2-console/**"));
         }
-        
+
         return http
-                .csrf(AbstractHttpConfigurer::disable) // 🔓 CSRF 비활성화
+                .csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
                                 "/v3/api-docs/**",
                                 "/swagger-ui/**",
                                 "/swagger-ui.html",
-                                "/api/**"
-                        ).permitAll() // 🔓 Swagger 허용
-                        .anyRequest().permitAll() // 🔓 나머지도 지금은 전체 허용
+                                "/swagger-resources/**",
+                                "/webjars/**",
+                                "/api/**",
+                                "/h2-console/**" // ✅ H2 콘솔 허용
+                        ).permitAll()
+                        .anyRequest().permitAll()
                 )
-                .formLogin(AbstractHttpConfigurer::disable) // 🔒 기본 로그인 폼 비활성화
+                .formLogin(AbstractHttpConfigurer::disable)
                 .build();
     }
 }
