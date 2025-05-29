@@ -1,8 +1,6 @@
 package com.convention_store.controller;
 
-import com.convention_store.dto.PostCreateDto;
-import com.convention_store.dto.PostDetailDto;
-import com.convention_store.dto.PostDto;
+import com.convention_store.dto.*;
 import com.convention_store.service.CommunityService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -64,4 +62,22 @@ public class CommunityController {
         PostDto created = communityService.createPost(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
+
+    @Operation(summary = "게시글 댓글 등록", description = "해당 게시글에 댓글을 추가합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "댓글 등록 성공"),
+            @ApiResponse(responseCode = "404", description = "게시글이 존재하지 않음")
+    })
+    @PostMapping("/posts/{postId}/comments")
+    public ResponseEntity<CommentDto> createComment(
+            @PathVariable Long postId,
+            @RequestBody CommentCreateDto request
+    ) {
+        CommentDto saved = communityService.createComment(postId, request);
+        return ResponseEntity.status(HttpStatus.CREATED).body(saved);
+    }
+
+
+
+
 }
