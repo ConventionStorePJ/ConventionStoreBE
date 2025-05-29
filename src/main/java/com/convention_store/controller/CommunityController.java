@@ -108,6 +108,20 @@ public class CommunityController {
         return ResponseEntity.noContent().build();
     }
 
+    @DeleteMapping("/posts/{postId}/comments/{commentId}")
+    @Operation(summary = "댓글 삭제", description = "비밀번호 검증 후 댓글을 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "댓글 삭제 성공")
+    })
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable Long commentId,
+            @RequestBody PasswordCheckDto dto
+    ) {
+        communityService.deleteComment(commentId, dto.getPasswordHash());
+        return ResponseEntity.noContent().build();
+    }
+
+
 
 
 

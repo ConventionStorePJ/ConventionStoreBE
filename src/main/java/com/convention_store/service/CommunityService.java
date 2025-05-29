@@ -93,7 +93,12 @@ public class CommunityService {
     }
 
     //댓글 삭제
-
+    public void deleteComment(Long commentId, String passwordHash) {
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new EntityNotFoundException("댓글 없음"));
+        validatePassword(passwordHash, comment.getPasswordHash());
+        commentRepository.delete(comment);
+    }
 
     //비밀번호 검증
     private void validatePassword(String input, String actual) {
