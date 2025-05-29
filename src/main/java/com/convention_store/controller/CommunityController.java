@@ -65,6 +65,7 @@ public class CommunityController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+
     @Operation(summary = "게시글 댓글 등록", description = "해당 게시글에 댓글을 추가합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "댓글 등록 성공"),
@@ -79,12 +80,11 @@ public class CommunityController {
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
 
+
     @PutMapping("/posts/{postId}")
     @Operation(summary = "게시글 수정", description = "비밀번호 검증 후 게시글 제목/내용을 수정합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = PostDto.class))),
-            @ApiResponse(responseCode = "400", description = "비밀번호 불일치 또는 유효성 실패"),
-            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음")
     })
     public ResponseEntity<PostDto> updatePost(
             @PathVariable Long postId,
@@ -93,6 +93,21 @@ public class CommunityController {
         PostDto updated = communityService.updatePost(postId, updateDto);
         return ResponseEntity.ok(updated);
     }
+
+
+    @DeleteMapping("/posts/{postId}")
+    @Operation(summary = "게시글 삭제", description = "비밀번호 검증 후 게시글을 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "삭제 성공")
+    })
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long postId,
+            @RequestBody PasswordCheckDto dto
+    ) {
+        communityService.deletePost(postId, dto.getPasswordHash());
+        return ResponseEntity.noContent().build();
+    }
+
 
 
 

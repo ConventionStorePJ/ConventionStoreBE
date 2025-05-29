@@ -84,6 +84,18 @@ public class CommunityService {
         return PostDto.from(post);
     }
 
+    //게시글 삭제
+    public void deletePost(Long postId, String passwordHash) {
+        Post post = communityRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("게시글 없음"));
+        validatePassword(passwordHash, post.getPasswordHash());
+        communityRepository.delete(post);
+    }
+
+    //댓글 삭제
+
+
+    //비밀번호 검증
     private void validatePassword(String input, String actual) {
         if (!Objects.equals(input, actual)) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");

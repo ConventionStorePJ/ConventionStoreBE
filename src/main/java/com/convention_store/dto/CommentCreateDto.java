@@ -15,7 +15,7 @@ public class CommentCreateDto {
     @Schema(description = "댓글 내용", example = "이 조합 정말 맛있어 보이네요!")
     private String content;
 
-    @Schema(description = "비밀번호 해시", example = "hashed1234")
+    @Schema(description = "비밀번호 해시", example = "hash1234")
     private String passwordHash;
 
     public Comment toEntity(Post post) {
