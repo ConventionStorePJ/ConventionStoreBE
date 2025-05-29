@@ -2,5 +2,5 @@
 package com.convention_store.domain.enums;
 
 public enum DiscountType {
-    ONEPLUS, TWOPLUS, DISCOUNT
+    NONE, ONEPLUS, TWOPLUS, DISCOUNT
 }
