@@ -1,9 +1,14 @@
 package com.convention_store.service;
 
+import com.convention_store.domain.Combination;
+import com.convention_store.domain.Franchise;
 import com.convention_store.domain.Post;
+import com.convention_store.dto.PostCreateDto;
 import com.convention_store.dto.PostDetailDto;
 import com.convention_store.dto.PostDto;
+import com.convention_store.repository.CombinationRepository;
 import com.convention_store.repository.CommunityRepository;
+import com.convention_store.repository.FranchiseRepository;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,6 +21,12 @@ public class CommunityService {
 
     @Autowired
     private CommunityRepository communityRepository;
+
+    @Autowired
+    private FranchiseRepository franchiseRepository;
+
+    @Autowired
+    private CombinationRepository combinationRepository;
 
     // 전체 게시글 가져오기
     public List<PostDto> getAllPosts() {
@@ -32,5 +43,22 @@ public class CommunityService {
 
         return PostDetailDto.from(post);
     }
+
+    public PostDto createPost(PostCreateDto request) {
+        Franchise franchise = franchiseRepository.findById(request.getFranchiseId())
+                .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 프랜차이즈입니다."));
+
+        Combination combination = null;
+        if (request.getCombinationId() != null) {
+            combination = combinationRepository.findById(request.getCombinationId())
+                    .orElse(null); // 없어도 null 처리
+        }
+
+        Post post = request.toEntity(franchise, combination);
+        Post saved = communityRepository.save(post);
+
+        return PostDto.from(saved);
+    }
+
 
 }
