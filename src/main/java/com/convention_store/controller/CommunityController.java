@@ -3,6 +3,8 @@ package com.convention_store.controller;
 import com.convention_store.dto.*;
 import com.convention_store.service.CommunityService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -76,6 +78,22 @@ public class CommunityController {
         CommentDto saved = communityService.createComment(postId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
+
+    @PutMapping("/posts/{postId}")
+    @Operation(summary = "게시글 수정", description = "비밀번호 검증 후 게시글 제목/내용을 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = PostDto.class))),
+            @ApiResponse(responseCode = "400", description = "비밀번호 불일치 또는 유효성 실패"),
+            @ApiResponse(responseCode = "404", description = "게시글을 찾을 수 없음")
+    })
+    public ResponseEntity<PostDto> updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostUpdateDto updateDto
+    ) {
+        PostDto updated = communityService.updatePost(postId, updateDto);
+        return ResponseEntity.ok(updated);
+    }
+
 
 
 

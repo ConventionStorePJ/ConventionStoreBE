@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 @Service
@@ -73,6 +74,22 @@ public class CommunityService {
         commentRepository.save(comment);
         return CommentDto.from(comment);
     }
+
+    // 게시글 수정
+    public PostDto updatePost(Long postId, PostUpdateDto dto) {
+        Post post = communityRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("게시글 없음"));
+        validatePassword(dto.getPasswordHash(), post.getPasswordHash());
+        post.updatePost(dto.getTitle(), dto.getContent(), post.getAuthorName(), post.getPasswordHash());
+        return PostDto.from(post);
+    }
+
+    private void validatePassword(String input, String actual) {
+        if (!Objects.equals(input, actual)) {
+            throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
+        }
+    }
+
 
 
 }
