@@ -1,6 +1,7 @@
 package com.convention_store.dto;
 
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -34,7 +35,7 @@ public class PostDetailDto {
                                 post.getComments().stream()
                                         .map(CommentDto::from)
                                         .collect(Collectors.toList())
-                                : null
+                                : Collections.emptyList()
                 )
                 .franchiseName(
                         post.getFranchise() != null ? post.getFranchise().getName() : null
