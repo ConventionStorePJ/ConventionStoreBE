@@ -27,7 +27,7 @@ public class PostDto {
                 .authorName(post.getAuthorName())
                 .createdAt(post.getCreatedAt())
                 .likeCount(post.getLikeCount() != null ? post.getLikeCount() : 0L)
-                .commentCount(0L) // 아직 댓글 기능 미구현이면 기본값
+                .commentCount((long) post.getComments().size()) // 아직 댓글 기능 미구현이면 기본값
                 .franchiseName(
                         post.getFranchise() != null ? post.getFranchise().getName() : null
                 )
