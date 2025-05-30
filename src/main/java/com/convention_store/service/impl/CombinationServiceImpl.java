@@ -13,6 +13,7 @@ import com.convention_store.repository.CombinationRepository;
 import com.convention_store.repository.FranchiseRepository;
 import com.convention_store.repository.ItemRepository;
 import com.convention_store.service.CombinationService;
+import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import java.util.Arrays;
 import java.util.List;
@@ -52,17 +53,29 @@ public class CombinationServiceImpl implements CombinationService {
     
     @Override
     public CombinationDto getCombination(Long combinationId) {
-        Combination combination = combinationRepository.findById(combinationId).orElseThrow(() -> new IllegalArgumentException("Combination not found"));
+        Combination combination = combinationRepository.findById(combinationId)
+            .orElseThrow(() -> new EntityNotFoundException("Combination not found"));
+        
         return CombinationDto.from(combination);
     }
     
+    // TODO: 문서화 - 엔티티 빌더로 깔끔하게 문제해결하기
     @Override
     @Transactional
     public CombinationDto createCombination(CombinationCreateDto combinationCreateDto) {
-        Combination combination = new Combination(combinationCreateDto);
-        createCombinationItem(combination, combinationCreateDto.getItemIdList(), combinationCreateDto.getFranchiseId());
+        Franchise franchise = franchiseRepository.findById(combinationCreateDto.getFranchiseId())
+            .orElseThrow(() -> new IllegalArgumentException("Franchise not found"));
         
+        Combination combination = Combination.builder()
+                .title(combinationCreateDto.getTitle())
+                .franchise(franchise)
+                .description(combinationCreateDto.getDescription())
+                .category(combinationCreateDto.getTag())
+                .build();
         combinationRepository.save(combination);
+        
+        createCombinationItem(combination, combinationCreateDto.getItemIdList(), franchise);
+        
         return CombinationDto.from(combinationRepository.save(combination));
     }
     
@@ -70,9 +83,8 @@ public class CombinationServiceImpl implements CombinationService {
     protected void createCombinationItem(
         Combination combination,
         List<Long> itemIdList,
-        Long franchiseId
+        Franchise franchise
     ) {
-        Franchise franchise = franchiseRepository.findById(franchiseId).orElseThrow(() -> new IllegalArgumentException("Franchise not found"));
         itemIdList.forEach(id -> {
             Item item = itemRepository
                 .findById(id)
