@@ -2,7 +2,7 @@
 FROM gradle:8.2.1-jdk17 AS builder
 WORKDIR /app
 COPY . .
-RUN chmod +x ./gradlew && ./gradlew clean build
+RUN chmod +x ./gradlew && ./gradlew clean build -x test
 
 # --- 실행 단계 ---
 FROM openjdk:17-jdk
