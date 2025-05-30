@@ -59,21 +59,26 @@ public class Combination extends BaseTimeEntity {
     private List<CombinationItem> combinationItems = new ArrayList<>();
     
     @Builder
-    public Combination(CombinationCreateDto combinationCreateDto) {
-        if (combinationCreateDto.getName() == null || combinationCreateDto.getName().isBlank()) {
+    public Combination(String title, String description, CombinationCategoryType category, Franchise franchise) {
+        if (title == null || title.isBlank()) {
             throw new IllegalArgumentException("Combination title cannot be null or blank.");
         }
-        if (combinationCreateDto.getTag() == null) {
+        if (category == null) {
             throw new IllegalArgumentException("Combination category cannot be null or blank.");
         }
-        if (combinationCreateDto.getDescription() == null || combinationCreateDto.getDescription().isBlank()) {
+        if (description == null || description.isBlank()) {
             throw new IllegalArgumentException("Combination description cannot be null or blank.");
         }
-        this.title = combinationCreateDto.getName();
-        this.description = combinationCreateDto.getDescription();
-        this.category = combinationCreateDto.getTag();
+        if (franchise == null) {
+            throw new IllegalArgumentException("Combination franchise cannot be null or blank.");
+        }
+        
+        this.title = title;
+        this.description = description;
+        this.category = category;
         this.likeCount = 0L;
         this.posts = new ArrayList<>();
+        this.franchise = franchise;
         this.combinationItems = new ArrayList<>();
     }
     
