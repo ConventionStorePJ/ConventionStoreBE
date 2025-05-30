@@ -19,7 +19,7 @@ public class PostCreateDto {
     private String authorName;
 
     @Schema(description = "비밀번호 해시", example = "hash1234")
-    private String passwordHash;
+    private String password;
 
     @Schema(description = "프랜차이즈 ID", example = "1")
     private Long franchiseId;
@@ -27,13 +27,15 @@ public class PostCreateDto {
     @Schema(description = "꿀조합 ID (nullable)", example = "3")
     private Long combinationId;
 
+    // TODO: 응집도 관련해서 문서화하기
     // Post Entity로 변환
     public Post toEntity(Franchise franchise, Combination combination) {
         return Post.builder()
                 .title(this.title)
                 .content(this.content)
                 .authorName(this.authorName)
-                .passwordHash(this.passwordHash)
+                .likeCount(0L)
+                .passwordHash(this.password)
                 .franchise(franchise)
                 .combination(combination)
                 .build();

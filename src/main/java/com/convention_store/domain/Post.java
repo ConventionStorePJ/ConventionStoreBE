@@ -9,6 +9,7 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @Entity
 @Table(name = "post")
@@ -54,12 +55,13 @@ public class Post extends BaseTimeEntity {
     }
 
     @Builder
-    public Post(String title, String content, String authorName, String passwordHash, Combination combination, Franchise franchise) {
+    public Post(String title, String content, String authorName, Long likeCount, String passwordHash, Combination combination, Franchise franchise) {
         if (title == null || title.isBlank() || content == null || content.isBlank()) {
             throw new IllegalArgumentException("Post title and content cannot be null or blank.");
         }
         this.title = title;
         this.content = content;
+        this.likeCount = likeCount;
         this.authorName = authorName;
         this.passwordHash = passwordHash;
         // 빌더를 통해 생성 시에도 연관관계 동기화

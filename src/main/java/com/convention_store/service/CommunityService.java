@@ -58,7 +58,7 @@ public class CommunityService {
             combination = combinationRepository.findById(request.getCombinationId())
                     .orElse(null); // 없어도 null 처리
         }
-
+        
         Post post = request.toEntity(franchise, combination);
         Post saved = communityRepository.save(post);
 
