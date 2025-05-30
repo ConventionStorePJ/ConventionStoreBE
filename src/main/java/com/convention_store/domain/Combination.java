@@ -1,11 +1,17 @@
 package com.convention_store.domain;
 
+import com.convention_store.domain.enums.CombinationCategoryType;
+import com.convention_store.dto.request.CombinationCreateDto;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AccessLevel;
@@ -32,22 +38,43 @@ public class Combination extends BaseTimeEntity {
     @Column(name = "title", length = 50, nullable = false)
     private String title;
     
+    @Column
+    @Enumerated(EnumType.STRING)
+    private CombinationCategoryType category;
+    
     @Column(name = "description", length = 255)
     private String description;
     
     @OneToMany(mappedBy = "combination", fetch = FetchType.LAZY)
     private List<Post> posts = new ArrayList<>();
     
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "franchise_id")
+    private Franchise franchise;
+    
+    @Column(name = "like_count")
+    private Long likeCount;
+    
     @OneToMany(mappedBy = "combination", fetch = FetchType.LAZY)
     private List<CombinationItem> combinationItems = new ArrayList<>();
     
     @Builder
-    public Combination(String title, String description) {
-        if (title == null || title.isBlank()) {
+    public Combination(CombinationCreateDto combinationCreateDto) {
+        if (combinationCreateDto.getName() == null || combinationCreateDto.getName().isBlank()) {
             throw new IllegalArgumentException("Combination title cannot be null or blank.");
         }
-        this.title = title;
-        this.description = description;
+        if (combinationCreateDto.getTag() == null) {
+            throw new IllegalArgumentException("Combination category cannot be null or blank.");
+        }
+        if (combinationCreateDto.getDescription() == null || combinationCreateDto.getDescription().isBlank()) {
+            throw new IllegalArgumentException("Combination description cannot be null or blank.");
+        }
+        this.title = combinationCreateDto.getName();
+        this.description = combinationCreateDto.getDescription();
+        this.category = combinationCreateDto.getTag();
+        this.likeCount = 0L;
+        this.posts = new ArrayList<>();
+        this.combinationItems = new ArrayList<>();
     }
     
     // --- 비즈니스 로직 (관계 추가) ---
