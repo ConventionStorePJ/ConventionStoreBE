@@ -1,20 +1,17 @@
 package com.convention_store.service;
 
-import com.convention_store.domain.Combination;
-import com.convention_store.domain.Comment;
-import com.convention_store.domain.Franchise;
-import com.convention_store.domain.Post;
+import com.convention_store.domain.*;
 import com.convention_store.dto.*;
-import com.convention_store.repository.CombinationRepository;
-import com.convention_store.repository.CommentRepository;
-import com.convention_store.repository.CommunityRepository;
-import com.convention_store.repository.FranchiseRepository;
+import com.convention_store.repository.*;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Objects;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -31,6 +28,9 @@ public class CommunityService {
 
     @Autowired
     private CommentRepository commentRepository;
+
+    @Autowired
+    private LikeRepository likeRepository;
 
     // 전체 게시글 가져오기
     public List<PostDto> getAllPosts() {
@@ -84,7 +84,7 @@ public class CommunityService {
         return PostDto.from(post);
     }
 
-    //게시글 삭제
+    // 게시글 삭제
     public void deletePost(Long postId, String passwordHash) {
         Post post = communityRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("게시글 없음"));
@@ -92,7 +92,7 @@ public class CommunityService {
         communityRepository.delete(post);
     }
 
-    //댓글 삭제
+    // 댓글 삭제
     public void deleteComment(Long commentId, String passwordHash) {
         Comment comment = commentRepository.findById(commentId)
                 .orElseThrow(() -> new EntityNotFoundException("댓글 없음"));
@@ -100,11 +100,44 @@ public class CommunityService {
         commentRepository.delete(comment);
     }
 
-    //비밀번호 검증
+    // 비밀번호 검증
     private void validatePassword(String input, String actual) {
         if (!Objects.equals(input, actual)) {
             throw new IllegalArgumentException("비밀번호가 일치하지 않습니다.");
         }
+    }
+
+    // 좋아요
+    @Transactional
+    public LikeDto toggleLike(Long postId, HttpServletRequest request) {
+        Post post = communityRepository.findById(postId)
+                .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
+
+        String ip = request.getRemoteAddr();
+        String userAgent = request.getHeader("User-Agent");
+        String fingerprint = ip + ":" + userAgent;
+
+        Optional<Like> existingLike = likeRepository.findByPostIdAndFingerprint(postId, fingerprint);
+
+        String message;
+        if (existingLike.isPresent()) {
+            likeRepository.delete(existingLike.get());
+            message = "좋아요 취소됨";
+        } else {
+            Like like = Like.builder()
+                    .post(post)
+                    .fingerprint(fingerprint)
+                    .build();
+            likeRepository.save(like);
+            message = "좋아요 등록됨";
+        }
+
+        communityRepository.save(post);
+
+        return LikeDto.builder()
+                .message(message)
+                .likeCount(post.getLikeCount())
+                .build();
     }
 
 

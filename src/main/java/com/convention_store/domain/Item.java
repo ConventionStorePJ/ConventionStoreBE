@@ -34,12 +34,8 @@ public class Item extends BaseTimeEntity {
     @JoinColumn(name = "franchise_id", nullable = false)
     private Franchise franchise;
 
-    
     @Column(name = "image_url")
     private String imageUrl;
-    
-    @Column(name = "price")
-    private Long price;
     
     // 복수할인이 들어가는 경우는 거의 없으므로 onetoone으로 변경
     @OneToOne(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -129,16 +125,5 @@ public class Item extends BaseTimeEntity {
             throw new IllegalArgumentException("Item name cannot be null or blank.");
         }
         this.itemName = newItemName;
-    }
-    
-    // TODO: 리팩토링 필요 - Repository 로 올려야하는가?
-    public DiscountType getDiscountType() {
-        List<Discount> discounts = new ArrayList<>();
-        for (Discount discount : this.discounts) {
-            if (LocalDateTime.now().isBefore(discount.getEndDate()))
-                discounts.add(discount);
-        }
-        if (discounts.isEmpty()) return DiscountType.NONE;
-        return discounts.get(0).getDiscountType();
     }
 }

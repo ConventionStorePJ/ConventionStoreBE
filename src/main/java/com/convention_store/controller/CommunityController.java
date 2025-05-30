@@ -8,12 +8,14 @@ import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 
 @Tag(name = "커뮤니티", description = "커뮤니티 관련 API")
 @RequestMapping("/api")
@@ -120,6 +122,19 @@ public class CommunityController {
         communityService.deleteComment(commentId, dto.getPasswordHash());
         return ResponseEntity.noContent().build();
     }
+
+    @PostMapping("/api/posts/{postId}/like")
+    @Operation(summary = "게시글 좋아요 토글", description = "좋아요가 없으면 등록, 있으면 취소합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "정상 처리")
+    })
+    public ResponseEntity<LikeDto> toggleLike(@PathVariable Long postId, HttpServletRequest request) {
+        LikeDto response = communityService.toggleLike(postId, request);
+        return ResponseEntity.ok(response);
+    }
+
+
+
 
 
 
