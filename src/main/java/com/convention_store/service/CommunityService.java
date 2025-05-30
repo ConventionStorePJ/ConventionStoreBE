@@ -79,8 +79,9 @@ public class CommunityService {
     public PostDto updatePost(Long postId, PostUpdateDto dto) {
         Post post = communityRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("게시글 없음"));
-        validatePassword(dto.getPasswordHash(), post.getPasswordHash());
+        validatePassword(dto.getPassword(), post.getPasswordHash());
         post.updatePost(dto.getTitle(), dto.getContent(), post.getAuthorName(), post.getPasswordHash());
+        communityRepository.save(post);
         return PostDto.from(post);
     }
 
@@ -110,13 +111,14 @@ public class CommunityService {
     // 좋아요
     @Transactional
     public LikeDto toggleLike(Long postId, HttpServletRequest request) {
+        
         Post post = communityRepository.findById(postId)
                 .orElseThrow(() -> new EntityNotFoundException("게시글을 찾을 수 없습니다."));
 
         String ip = request.getRemoteAddr();
         String userAgent = request.getHeader("User-Agent");
         String fingerprint = ip + ":" + userAgent;
-
+        
         Optional<Like> existingLike = likeRepository.findByPostIdAndFingerprint(postId, fingerprint);
 
         String message;

@@ -16,14 +16,14 @@ public class CommentCreateDto {
     private String content;
 
     @Schema(description = "비밀번호 해시", example = "hash1234")
-    private String passwordHash;
+    private String password;
 
     public Comment toEntity(Post post) {
         return Comment.builder()
                 .post(post)
                 .authorName(authorName)
                 .content(content)
-                .passwordHash(passwordHash)
+                .passwordHash(password)
                 .build();
     }
 }
