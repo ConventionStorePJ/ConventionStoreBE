@@ -30,12 +30,9 @@ public class Item extends BaseTimeEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "franchise_id", nullable = false)
     private Franchise franchise;
-    
+
     @Column(name = "image_url")
     private String imageUrl;
-    
-    @Column(name = "price")
-    private Long price;
     
     // 복수할인이 들어가는 경우는 거의 없으므로 onetoone으로 변경
     @OneToOne(mappedBy = "item", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -123,5 +120,5 @@ public class Item extends BaseTimeEntity {
         }
         this.itemName = newItemName;
     }
-    
+  
 }

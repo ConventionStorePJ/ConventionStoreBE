@@ -49,6 +49,10 @@ public class Post extends BaseTimeEntity {
     private List<Comment> comments = new ArrayList<>();
 
 
+    public void updateLikeCount(Long likeCount) {
+        this.likeCount = likeCount;
+    }
+
     @Builder
     public Post(String title, String content, String authorName, String passwordHash, Combination combination, Franchise franchise) {
         if (title == null || title.isBlank() || content == null || content.isBlank()) {
