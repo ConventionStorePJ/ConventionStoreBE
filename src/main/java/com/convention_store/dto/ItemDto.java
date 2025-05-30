@@ -23,7 +23,7 @@ public class ItemDto {
                 .discountType(
                         item.getDiscount() != null
                                 ? item.getDiscount().getDiscountType()
-                                : null
+                                : DiscountType.NONE
                 )
                 .imageUrl(item.getImageUrl())
                 .price(item.getPrice())
