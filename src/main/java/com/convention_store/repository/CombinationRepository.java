@@ -11,18 +11,19 @@ import org.springframework.stereotype.Repository;
 @Repository
 public interface CombinationRepository extends JpaRepository<Combination, Long> {
     
-    @Query("SELECT Combination FROM Combination c "
-        + "WHERE :franchiseId IS NOT NULL OR (:franchiseId = c.franchise.id) "
-        + "AND :category IS NOT NULL OR (:category = c.category) "
+    @Query("SELECT c FROM Combination c "
+        + "WHERE (:franchiseId IS NOT NULL OR c.franchise.id = :franchiseId) "
+        + "AND (:category IS NOT NULL OR c.category = :category)"
         + "ORDER BY c.likeCount DESC")
     List<Combination> findByCategoryAndFranchiseIdOrderByLikeCountDesc(
         @Param("franchiseId") Long franchiseId,
         @Param("category") CombinationCategoryType category
     );
     
-    @Query("SELECT Combination FROM Combination c "
-        + "WHERE :franchiseId IS NOT NULL OR (:franchiseId = c.franchise.id) "
-        + "AND :category IS NOT NULL OR (:category = c.category) "
+    // TODO: JPQL 에서 SELECT 해오는 값은 별칭이 필수 : 엔티티 자체를 선택하려면 해당 엔티티의 별칭(c)을 사용해야 합니다.
+    @Query("SELECT c FROM Combination c "
+        + "WHERE (:franchiseId IS NOT NULL OR c.franchise.id = :franchiseId) "
+        + "AND (:category IS NOT NULL OR c.category = :category)"
         + "ORDER BY c.createdAt DESC")
     List<Combination> findByCategoryAndFranchiseIdOrderByCreateAtDesc(
         @Param("franchiseId") Long franchiseId,
