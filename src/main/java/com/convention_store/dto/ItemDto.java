@@ -12,6 +12,7 @@ public class ItemDto {
     private Long franchiseId;
     private String itemName;
     private DiscountType discountType;
+    private String imageUrl;
     private Long price;
   
     public static ItemDto from(Item item) {
@@ -24,6 +25,7 @@ public class ItemDto {
                                 ? item.getDiscount().getDiscountType()
                                 : null
                 )
+                .imageUrl(item.getImageUrl())
                 .price(item.getPrice())
                 .build();
     }
