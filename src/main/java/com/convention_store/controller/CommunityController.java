@@ -15,10 +15,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @Tag(name = "커뮤니티", description = "커뮤니티 관련 API")
-@RequestMapping("/api")
+@RequestMapping("/api/posts")
 @RestController
 public class CommunityController {
 
@@ -33,7 +32,7 @@ public class CommunityController {
             @ApiResponse(responseCode = "200", description = "정상적으로 게시글 목록 반환"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @GetMapping("/posts")
+    @GetMapping("")
     public ResponseEntity<List<PostDto>> getAllPosts() {
         List<PostDto> posts = communityService.getAllPosts();
         return ResponseEntity.ok(posts);
@@ -48,7 +47,7 @@ public class CommunityController {
             @ApiResponse(responseCode = "200", description = "정상적으로 게시글 정보 반환"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @GetMapping("/posts/{postId}")
+    @GetMapping("/{postId}")
     public ResponseEntity<PostDetailDto> getPost(@PathVariable Long postId){
         PostDetailDto post = communityService.getPost(postId);
         return ResponseEntity.ok(post);
@@ -61,7 +60,7 @@ public class CommunityController {
             @ApiResponse(responseCode = "400", description = "입력값 오류"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
-    @PostMapping("/posts")
+    @PostMapping("")
     public ResponseEntity<PostDto> createPost(@RequestBody PostCreateDto request) {
         PostDto created = communityService.createPost(request);
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
@@ -73,7 +72,7 @@ public class CommunityController {
             @ApiResponse(responseCode = "201", description = "댓글 등록 성공"),
             @ApiResponse(responseCode = "404", description = "게시글이 존재하지 않음")
     })
-    @PostMapping("/posts/{postId}/comments")
+    @PostMapping("/{postId}/comments")
     public ResponseEntity<CommentDto> createComment(
             @PathVariable Long postId,
             @RequestBody CommentCreateDto request
@@ -83,7 +82,7 @@ public class CommunityController {
     }
 
 
-    @PutMapping("/posts/{postId}")
+    @PutMapping("/{postId}")
     @Operation(summary = "게시글 수정", description = "비밀번호 검증 후 게시글 제목/내용을 수정합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = PostDto.class))),
@@ -97,7 +96,7 @@ public class CommunityController {
     }
 
 
-    @DeleteMapping("/posts/{postId}")
+    @DeleteMapping("/{postId}")
     @Operation(summary = "게시글 삭제", description = "비밀번호 검증 후 게시글을 삭제합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "삭제 성공")
@@ -106,11 +105,11 @@ public class CommunityController {
             @PathVariable Long postId,
             @RequestBody PasswordCheckDto dto
     ) {
-        communityService.deletePost(postId, dto.getPasswordHash());
+        communityService.deletePost(postId, dto.getPassword());
         return ResponseEntity.noContent().build();
     }
 
-    @DeleteMapping("/posts/{postId}/comments/{commentId}")
+    @DeleteMapping("/{postId}/comments/{commentId}")
     @Operation(summary = "댓글 삭제", description = "비밀번호 검증 후 댓글을 삭제합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "204", description = "댓글 삭제 성공")
@@ -119,11 +118,11 @@ public class CommunityController {
             @PathVariable Long commentId,
             @RequestBody PasswordCheckDto dto
     ) {
-        communityService.deleteComment(commentId, dto.getPasswordHash());
+        communityService.deleteComment(commentId, dto.getPassword());
         return ResponseEntity.noContent().build();
     }
 
-    @PostMapping("/api/posts/{postId}/like")
+    @PostMapping("/{postId}/like")
     @Operation(summary = "게시글 좋아요 토글", description = "좋아요가 없으면 등록, 있으면 취소합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "정상 처리")
