@@ -1,6 +1,6 @@
 package com.convention_store.handler;
 
-import java.util.NoSuchElementException;
+import jakarta.persistence.EntityNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -9,7 +9,6 @@ import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.context.request.WebRequest;
 
 @ControllerAdvice(basePackages = "com.convention_store")
 public class GlobalControllerAdvice {
@@ -19,8 +18,7 @@ public class GlobalControllerAdvice {
     // 1. JSON 파싱 오류 (요청 본문 형식 오류) -> 400 Bad Request
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<Object> handleHttpMessageNotReadable(
-        HttpMessageNotReadableException ex,
-        WebRequest request
+        HttpMessageNotReadableException ex
     ) {
         logger.warn("Bad Request: Invalid or malformed request body. {}", ex.getMessage());
         // 사용자에게 노출할 메시지 정의
@@ -33,7 +31,7 @@ public class GlobalControllerAdvice {
     
     
     @ExceptionHandler(Exception.class)
-    public ResponseEntity<Object> handleAllExceptions(Exception ex, WebRequest request) {
+    public ResponseEntity<Object> handleAllExceptions(Exception ex) {
         logger.error(ex.getMessage());
         return new ResponseEntity<>(
             ex.getMessage(),
@@ -44,8 +42,7 @@ public class GlobalControllerAdvice {
     // 특정 예외에 대한 핸들러 추가
     @ExceptionHandler(IllegalArgumentException.class)
     public ResponseEntity<Object> handleIllegalArgument(
-        IllegalArgumentException ex,
-        WebRequest request
+        IllegalArgumentException ex
     ) {
         return new ResponseEntity<>(
             ex.getMessage(),
@@ -56,17 +53,16 @@ public class GlobalControllerAdvice {
     // 더 많은 특정 예외 핸들러를 추가할 수 있습니다
     
     @ExceptionHandler(IllegalStateException.class)
-    public ResponseEntity<Object> handleIllegalState(IllegalStateException ex, WebRequest request) {
+    public ResponseEntity<Object> handleIllegalState(IllegalStateException ex) {
         return new ResponseEntity<>(
             ex.getMessage(),
             HttpStatus.BAD_REQUEST // 400 응답
         );
     }
     
-    @ExceptionHandler(NoSuchElementException.class)
+    @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<Object> handleNoSuchElement(
-        NoSuchElementException ex,
-        WebRequest request
+        EntityNotFoundException ex
     ) {
         return new ResponseEntity<>(
             ex.getMessage(),
