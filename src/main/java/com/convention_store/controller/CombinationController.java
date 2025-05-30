@@ -25,10 +25,11 @@ public class CombinationController {
     
     @GetMapping("")
     public ResponseEntity<List<CombinationDto>> getCombinationList(
-        @RequestParam(name = "tagName") CombinationCategoryType tagName,
-        @RequestParam(name = "franchiseId") Long franchiseId,
-        @RequestParam(name = "sort") SortType sortType
+        @RequestParam(name = "tagName", required = false) CombinationCategoryType tagName,
+        @RequestParam(name = "franchiseId", required = false) Long franchiseId,
+        @RequestParam(name = "sort", required = false) SortType sortType
     ) {
+        if (sortType == null) sortType = SortType.RECENT;
         return ResponseEntity.ok(combinationService.getCombinationList(
             tagName,
             franchiseId,
