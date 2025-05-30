@@ -13,7 +13,7 @@ public class ItemDto {
     private String itemName;
     private DiscountType discountType;
     private Long price;
-
+  
     public static ItemDto from(Item item) {
         return ItemDto.builder()
                 .itemId(item.getId())
