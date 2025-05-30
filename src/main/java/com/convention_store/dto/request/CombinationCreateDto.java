@@ -8,7 +8,7 @@ import lombok.Getter;
 @Getter
 @Builder
 public class CombinationCreateDto {
-    private String name;
+    private String title;
     private String description;
     private CombinationCategoryType tag;
     private Long franchiseId;
