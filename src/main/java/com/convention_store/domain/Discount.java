@@ -31,9 +31,9 @@ public class Discount extends BaseTimeEntity {
     
     @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
-
-    @OneToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "item_id", nullable = false)
+    
+    @OneToOne(optional = true) // No mappedBy here because this is the owning side
+    @JoinColumn(name = "item_id", unique = true)
     private Item item;
     
     @Builder
