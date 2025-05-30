@@ -1,17 +1,7 @@
 package com.convention_store.domain;
 
 import com.convention_store.domain.enums.DiscountType;
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
-import jakarta.persistence.FetchType;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.AccessLevel;
 import lombok.Builder;
 import lombok.EqualsAndHashCode;
@@ -41,8 +31,8 @@ public class Discount extends BaseTimeEntity {
     
     @Column(name = "end_date", nullable = false)
     private LocalDateTime endDate;
-    
-    @ManyToOne(fetch = FetchType.LAZY)
+
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "item_id", nullable = false)
     private Item item;
     
@@ -67,24 +57,33 @@ public class Discount extends BaseTimeEntity {
         if (item == null) {
             throw new IllegalArgumentException("Item cannot be null for Discount.");
         }
-        // 기존 관계 제거 (필요 시)
-        if (this.item != null) {
-            this.item.getDiscounts().remove(this);
+
+        // 기존에 연결된 아이템이 있다면 해제
+        if (this.item != null && this.item.getDiscount() == this) {
+            this.item.setDiscount(null);
         }
+
         this.item = item;
-        if (!item.getDiscounts().contains(this)) {
-            item.getDiscounts().add(this);
+
+        // item에도 Discount 설정 (양방향 동기화)
+        if (item.getDiscount() != this) {
+            item.setDiscount(this);
         }
     }
-    
+
+
+
     // 관계 제거 (nullable = false 이므로 일반적으로는 사용하지 않음, 예시로만)
     public void disassociateItem() {
         if (this.item != null) {
-            this.item.getDiscounts().remove(this);
+            if (this.item.getDiscount() == this) {
+                this.item.setDiscount(null);
+            }
             this.item = null;
         }
     }
-    
+
+
     // --- 비즈니스 로직 (필드 값 변경) ---
     public void updateDiscountPeriod(LocalDateTime newStartDate, LocalDateTime newEndDate) {
         if (newStartDate == null || newEndDate == null) {
