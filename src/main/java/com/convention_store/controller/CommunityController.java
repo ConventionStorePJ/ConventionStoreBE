@@ -3,6 +3,8 @@ package com.convention_store.controller;
 import com.convention_store.dto.*;
 import com.convention_store.service.CommunityService;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -63,6 +65,7 @@ public class CommunityController {
         return ResponseEntity.status(HttpStatus.CREATED).body(created);
     }
 
+
     @Operation(summary = "게시글 댓글 등록", description = "해당 게시글에 댓글을 추가합니다.")
     @ApiResponses({
             @ApiResponse(responseCode = "201", description = "댓글 등록 성공"),
@@ -76,6 +79,49 @@ public class CommunityController {
         CommentDto saved = communityService.createComment(postId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
+
+
+    @PutMapping("/posts/{postId}")
+    @Operation(summary = "게시글 수정", description = "비밀번호 검증 후 게시글 제목/내용을 수정합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "수정 성공", content = @Content(schema = @Schema(implementation = PostDto.class))),
+    })
+    public ResponseEntity<PostDto> updatePost(
+            @PathVariable Long postId,
+            @RequestBody PostUpdateDto updateDto
+    ) {
+        PostDto updated = communityService.updatePost(postId, updateDto);
+        return ResponseEntity.ok(updated);
+    }
+
+
+    @DeleteMapping("/posts/{postId}")
+    @Operation(summary = "게시글 삭제", description = "비밀번호 검증 후 게시글을 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "삭제 성공")
+    })
+    public ResponseEntity<Void> deletePost(
+            @PathVariable Long postId,
+            @RequestBody PasswordCheckDto dto
+    ) {
+        communityService.deletePost(postId, dto.getPasswordHash());
+        return ResponseEntity.noContent().build();
+    }
+
+    @DeleteMapping("/posts/{postId}/comments/{commentId}")
+    @Operation(summary = "댓글 삭제", description = "비밀번호 검증 후 댓글을 삭제합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "204", description = "댓글 삭제 성공")
+    })
+    public ResponseEntity<Void> deleteComment(
+            @PathVariable Long commentId,
+            @RequestBody PasswordCheckDto dto
+    ) {
+        communityService.deleteComment(commentId, dto.getPasswordHash());
+        return ResponseEntity.noContent().build();
+    }
+
+
 
 
 
