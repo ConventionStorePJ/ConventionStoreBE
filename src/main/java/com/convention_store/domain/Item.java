@@ -31,6 +31,9 @@ public class Item extends BaseTimeEntity {
     @JoinColumn(name = "franchise_id", nullable = false)
     private Franchise franchise;
 
+    @Column(name = "price")
+    private Long price;
+
     @Column(name = "image_url")
     private String imageUrl;
     
