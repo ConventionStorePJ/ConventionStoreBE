@@ -26,14 +26,10 @@ public class Item extends BaseTimeEntity {
     
     @Column(name = "item_name", length = 100, nullable = false)
     private String itemName;
-
-    @Column(name = "price", length = 100, nullable = false)
-    private Long price;
     
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "franchise_id", nullable = false)
     private Franchise franchise;
-
     
     @Column(name = "image_url")
     private String imageUrl;
@@ -96,8 +92,6 @@ public class Item extends BaseTimeEntity {
         discount.associateWithItem(this); // 양방향 관계 설정
     }
 
-
-
     public void addCombinationItem(CombinationItem combinationItem) {
         if (combinationItem == null) {
             throw new IllegalArgumentException("CombinationItem cannot be null.");
@@ -116,7 +110,6 @@ public class Item extends BaseTimeEntity {
         }
     }
 
-
     public void removeCombinationItem(CombinationItem combinationItem) {
         if (this.combinationItems.remove(combinationItem)) {
             combinationItem.disassociateItem();
@@ -131,14 +124,4 @@ public class Item extends BaseTimeEntity {
         this.itemName = newItemName;
     }
     
-    // TODO: 리팩토링 필요 - Repository 로 올려야하는가?
-    public DiscountType getDiscountType() {
-        List<Discount> discounts = new ArrayList<>();
-        for (Discount discount : this.discounts) {
-            if (LocalDateTime.now().isBefore(discount.getEndDate()))
-                discounts.add(discount);
-        }
-        if (discounts.isEmpty()) return DiscountType.NONE;
-        return discounts.get(0).getDiscountType();
-    }
 }
