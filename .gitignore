@@ -13,7 +13,7 @@ src/main/resources/application.properties
 src/main/resources/application-production.properties
 
 ## static web resources
-src/main/resources/static/images
+#src/main/resources/static/images
 
 ### STS ###
 .apt_generated
