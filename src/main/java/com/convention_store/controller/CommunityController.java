@@ -80,6 +80,13 @@ public class CommunityController {
         CommentDto saved = communityService.createComment(postId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
+    
+    @GetMapping("/{postId}/comments")
+    public ResponseEntity<List<CommentDto>> getComment(
+        @PathVariable Long postId
+    ) {
+        return ResponseEntity.ok(communityService.getComments(postId));
+    }
 
 
     @PutMapping("/{postId}")

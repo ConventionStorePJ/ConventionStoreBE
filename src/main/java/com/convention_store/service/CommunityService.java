@@ -74,6 +74,13 @@ public class CommunityService {
         commentRepository.save(comment);
         return CommentDto.from(comment);
     }
+    
+    public List<CommentDto> getComments(Long postId) {
+        Post post = communityRepository.findById(postId)
+            .orElseThrow(() -> new EntityNotFoundException("해당 게시글이 존재하지 않습니다."));
+        
+        return post.getComments().stream().map(CommentDto::from).collect(Collectors.toList());
+    }
 
     // 게시글 수정
     public PostDto updatePost(Long postId, PostUpdateDto dto) {
