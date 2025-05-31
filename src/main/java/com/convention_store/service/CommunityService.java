@@ -34,7 +34,7 @@ public class CommunityService {
 
     // 전체 게시글 가져오기
     public List<PostDto> getAllPosts() {
-        return communityRepository.findAll()
+        return communityRepository.findAllByOrderByCreatedAtDesc()
                 .stream()
                 .map(PostDto::from)
                 .collect(Collectors.toList());
