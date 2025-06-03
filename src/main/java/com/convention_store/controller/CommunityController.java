@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
+@CrossOrigin("*")
 @Tag(name = "커뮤니티", description = "커뮤니티 관련 API")
 @RequestMapping("/api/posts")
 @RestController
