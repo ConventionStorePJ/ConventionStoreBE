@@ -16,7 +16,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-@CrossOrigin("*")
 @Tag(name = "커뮤니티", description = "커뮤니티 관련 API")
 @RequestMapping("/api/posts")
 @RestController
@@ -81,7 +80,12 @@ public class CommunityController {
         CommentDto saved = communityService.createComment(postId, request);
         return ResponseEntity.status(HttpStatus.CREATED).body(saved);
     }
-    
+
+    @Operation(summary = "게시글 댓글 조회", description = "해당 게시글의 댓글을 조회합니다.")
+    @ApiResponses({
+            @ApiResponse(responseCode = "201", description = "댓글 조회 성공"),
+            @ApiResponse(responseCode = "404", description = "게시글이 존재하지 않음")
+    })
     @GetMapping("/{postId}/comments")
     public ResponseEntity<List<CommentDto>> getComment(
         @PathVariable Long postId
