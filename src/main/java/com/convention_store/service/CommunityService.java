@@ -33,9 +33,23 @@ public class CommunityService {
     private LikeRepository likeRepository;
 
     // 전체 게시글 가져오기
-    public List<PostDto> getAllPosts() {
-        return communityRepository.findAllByOrderByCreatedAtDesc()
-                .stream()
+    public List<PostDto> getAllPosts(String type) {
+        List<Post> posts;
+
+        switch (type.toLowerCase()) {
+            case "popular":
+                posts = communityRepository.findPopularPosts();
+                break;
+            case "combination":
+                posts = communityRepository.findCombinationPosts();
+                break;
+            case "normal":
+            default:
+                posts = communityRepository.findNormalPosts();
+                break;
+        }
+
+        return posts.stream()
                 .map(PostDto::from)
                 .collect(Collectors.toList());
     }
@@ -131,6 +145,8 @@ public class CommunityService {
         String message;
         if (existingLike.isPresent()) {
             likeRepository.delete(existingLike.get());
+            post.updateLikeCount(post.getLikeCount() - 1);
+
             message = "좋아요 취소됨";
         } else {
             Like like = Like.builder()
@@ -138,6 +154,7 @@ public class CommunityService {
                     .fingerprint(fingerprint)
                     .build();
             likeRepository.save(like);
+            post.updateLikeCount(post.getLikeCount() + 1);
             message = "좋아요 등록됨";
         }
 

@@ -26,15 +26,22 @@ public class CommunityController {
 
     @Operation(
             summary = "전체 게시글 조회",
-            description = "등록된 모든 커뮤니티 게시글 목록을 반환합니다."
+            description = """
+        등록된 모든 커뮤니티 게시글 목록을 반환합니다.  
+        type 파라미터로 조회할 게시글 종류를 선택할 수 있습니다.  
+        
+        - normal : 일반 게시글 (기본값)  
+        - popular : 인기 게시글  
+        - combination : 조합 게시글
+        """
     )
     @ApiResponses({
             @ApiResponse(responseCode = "200", description = "정상적으로 게시글 목록 반환"),
             @ApiResponse(responseCode = "500", description = "서버 오류")
     })
     @GetMapping("")
-    public ResponseEntity<List<PostDto>> getAllPosts() {
-        List<PostDto> posts = communityService.getAllPosts();
+    public ResponseEntity<List<PostDto>> getAllPosts(@RequestParam(required = false, defaultValue = "normal") String type) {
+        List<PostDto> posts = communityService.getAllPosts(type);
         return ResponseEntity.ok(posts);
     }
 

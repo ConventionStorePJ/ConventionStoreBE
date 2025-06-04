@@ -6,7 +6,7 @@ build/
 !**/src/test/**/build/
 
 ## docker-compose
-docker-compose.yml
+compose.yml
 
 ## properties files ##
 src/main/resources/application.properties
